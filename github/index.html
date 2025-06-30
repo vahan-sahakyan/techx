@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git & GitHub Fundamentals - Slides</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter & Poppins (for headings) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Gradient background for a fancier feel */
+            background: linear-gradient(135deg, #e0f2fe 0%, #c3dafe 100%); /* Light blue gradient */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem; /* Slightly more padding around the whole page */
+            color: #374151; /* Darker grey for overall text */
+        }
+
+        .slide-container {
+            background-color: #ffffff;
+            border-radius: 2rem; /* Even more rounded corners */
+            /* Enhanced shadow for a lifted effect */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            padding: 3rem; /* More generous padding inside slides */
+            width: 100%;
+            max-width: 1000px; /* Increased max-width for more content space */
+            height: 75vh; /* Slightly increased height for consistency */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0; /* Start hidden for animation */
+            transform: translateY(20px); /* Start slightly below for animation */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out; /* Smoother slide transitions */
+            overflow-y: auto; /* Enable scrolling for long slide content */
+            border: 1px solid #e2e8f0; /* Subtle border */
+        }
+
+        .slide-container.active-slide {
+            opacity: 1;
+            transform: translateY(0);
+            display: flex; /* Ensure it's displayed when active */
+        }
+
+        .hidden-slide {
+            display: none; /* Hide non-active slides */
+        }
+
+        .slide-container h1 {
+            font-family: 'Poppins', sans-serif; /* Poppins for main title */
+            font-weight: 800; /* Extra bold */
+            color: #1a202c; /* Darker title color */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* Subtle text shadow */
+        }
+
+        .slide-container h2 {
+            font-family: 'Poppins', sans-serif; /* Poppins for module titles */
+            font-size: 2.5rem; /* Larger heading for slides */
+            margin-bottom: 1.75rem;
+            color: #1f2937; /* Even darker heading */
+            border-bottom: 3px solid; /* Underline effect for module titles */
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            line-height: 1.2;
+            background: linear-gradient(90deg, #eff6ff, #ffffff); /* Subtle gradient for module title background */
+            padding-left: 1rem;
+            border-radius: 0.5rem;
+            border-left: 8px solid; /* Stronger left border */
+        }
+
+        .slide-container h2 .text-blue-500 { border-color: #3b82f6; }
+        .slide-container h2 .text-green-500 { border-color: #22c55e; }
+        .slide-container h2 .text-purple-500 { border-color: #8b5cf6; }
+        .slide-container h2 .text-red-500 { border-color: #ef4444; }
+        .slide-container h2 .text-yellow-500 { border-color: #eab308; }
+        .slide-container h2 .text-orange-500 { border-color: #f97316; } /* New color for conflict module */
+
+
+        .slide-container h3 {
+            font-family: 'Poppins', sans-serif; /* Poppins for sub-headings */
+            font-size: 1.75rem; /* Sub-heading size */
+            margin-bottom: 1.25rem;
+            color: #374151; /* Dark grey */
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .slide-container h3::before {
+            content: '👉'; /* Custom bullet point */
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .slide-container ul {
+            list-style: none; /* Remove default list style */
+            padding-left: 0; /* Remove default padding */
+        }
+
+        .slide-container ul li {
+            position: relative;
+            padding-left: 2rem; /* Space for custom bullet */
+            margin-bottom: 0.75rem; /* More space between list items */
+            line-height: 1.6;
+        }
+
+        .slide-container ul li::before {
+            content: '•'; /* Custom bullet */
+            position: absolute;
+            left: 0;
+            color: #6366f1; /* Indigo color for bullets */
+            font-size: 1.5rem;
+            line-height: 1;
+            top: 0.1rem;
+        }
+
+        .slide-container ul li strong {
+            color: #1f2937; /* Stronger color for emphasized text */
+        }
+
+        .slide-container .list-circle {
+            list-style: circle; /* Specific for nested lists */
+            padding-left: 1.5rem;
+        }
+
+        pre {
+            background-color: #2d3748; /* Darker background for code blocks */
+            color: #e2e8f0; /* Light text for code */
+            padding: 1.2rem 1.5rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            font-size: 0.9em;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); /* Inner shadow for depth */
+            border: 1px solid #4a5568; /* Subtle border */
+        }
+
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'monospace'; /* Monospace font for code snippets */
+            background-color: #e0e7ff; /* Light blue background for inline code */
+            color: #4f46e5; /* Indigo text for inline code */
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.3rem;
+        }
+
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 3rem; /* More space below slides */
+            gap: 2rem; /* Increased space between elements */
+        }
+
+        .nav-button {
+            background: linear-gradient(90deg, #6366f1, #818cf8); /* Indigo gradient */
+            color: white;
+            padding: 0.9rem 2.5rem; /* Larger buttons */
+            border-radius: 0.75rem;
+            font-weight: 700; /* Bolder text */
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transitions for all hover effects */
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3); /* Softer, colored shadow */
+            border: none;
+            position: relative; /* For subtle animation */
+            overflow: hidden; /* For ripple effect */
+        }
+
+        .nav-button:hover {
+            background: linear-gradient(90deg, #4f46e5, #6366f1); /* Darker gradient on hover */
+            transform: translateY(-3px); /* More pronounced lift */
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-button:disabled {
+            background: #cbd5e1; /* Gray-300 */
+            color: #6b7280; /* Gray-500 */
+            cursor: not-allowed;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .slide-counter {
+            font-size: 1.25rem; /* Larger counter */
+            font-weight: 600;
+            color: #4f46e5; /* Indigo color */
+            background-color: #e0e7ff; /* Lighter indigo background */
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .slide-container {
+                padding: 1.5rem;
+                height: auto;
+                min-height: 75vh;
+                border-radius: 1.5rem;
+            }
+            .slide-container h1 {
+                font-size: 3rem;
+            }
+            .slide-container h2 {
+                font-size: 1.75rem;
+                flex-direction: column; /* Stack icon and text */
+                align-items: flex-start;
+            }
+            .slide-container h2 span {
+                margin-bottom: 0.5rem;
+            }
+            .slide-container h3 {
+                font-size: 1.25rem;
+                padding-left: 1.25rem;
+            }
+            .slide-container h3::before {
+                font-size: 1rem;
+            }
+            .slide-container ul li {
+                font-size: 0.95rem;
+                padding-left: 1.5rem;
+            }
+            .slide-container ul li::before {
+                font-size: 1.25rem;
+                top: 0.2rem;
+            }
+            pre {
+                font-size: 0.75em;
+                padding: 0.75rem 1rem;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 1.25rem;
+                margin-top: 2rem;
+            }
+            .nav-button {
+                width: 90%;
+                padding: 0.8rem 2rem;
+            }
+            .slide-counter {
+                font-size: 1rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Title Slide -->
+    <div id="slide-0" class="slide-container">
+        <div class="flex flex-col justify-center h-full">
+            <h1 class="text-5xl sm:text-6xl font-extrabold text-gray-900 text-center mb-8">Git & GitHub Fundamentals</h1>
+            <p class="text-xl text-gray-600 text-center">A comprehensive guide to version control and collaborative development.</p>
+        </div>
+    </div>
+
+    <!-- Module 1 Slide -->
+    <div id="slide-1" class="slide-container hidden-slide">
+        <div>
+            <h2 class="font-bold text-gray-800 flex items-center">
+                <span class="text-blue-500 text-4xl mr-3">📘</span> Module 1: What is Git?
+            </h2>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">What We Learn:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li><strong class="font-medium text-gray-800">Why Version Control?</strong> Imagine writing an essay and wanting to save different versions (e.g., "essay_final_v1.docx", "essay_final_v2_really_final.docx"). Git automates this, tracking every change you make to your code. It's like a time machine for your project! This is essential for:
+                        <ul class="list-circle list-inside ml-4 mt-1">
+                            <li>Tracking all changes over time.</li>
+                            <li>Collaborating with others without overwriting work.</li>
+                            <li>Reverting to older versions if something breaks.</li>
+                            <li>Experimenting with new ideas safely.</li>
+                        </ul>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">Git vs GitHub: The Engine vs. The Platform</strong>
+                        <ul class="list-circle list-inside ml-4 mt-1">
+                            <li><strong class="font-medium text-gray-800">Git:</strong> This is the powerful *software* that runs on your computer. It's the "engine" that does the actual version control work – tracking changes, managing history, etc. You use Git commands in your terminal.</li>
+                            <li><strong class="font-medium text-gray-800">GitHub:</strong> This is a popular *website* (a platform) that hosts Git projects online. Think of it like Google Drive or Dropbox for your code. It adds collaboration features like sharing your code with others, reviewing changes, and managing projects. You can use Git without GitHub, but GitHub makes teamwork much easier!</li>
+                        </ul>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">Installation:</strong> Git is a command-line tool. You'll install it on your computer and interact with it via your terminal (e.g., Command Prompt on Windows, Terminal on Mac/Linux).
+                        <pre><code>git --version # Check if Git is installed and see its version</code></pre>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-3">Best Practices:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li>Always use <code class="bg-gray-100 text-gray-800 rounded px-1">.gitignore</code> from the start. This file tells Git to ignore certain files or folders (like temporary files, system files, or sensitive information) that you don't want to track in your project. This keeps your repository clean and focused only on the important code.</li>
+                    <li>Configure your global Git settings with your name and email. This is super important because every change you save (commit) will be linked to this identity. It helps your teammates know who made which changes.
+                        <pre><code>git config --global user.name "John Doe"       # Your full name
+git config --global user.email "john.doe@example.com" # Your email address</code></pre>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module 2 Slide -->
+    <div id="slide-2" class="slide-container hidden-slide">
+        <div>
+            <h2 class="font-bold text-gray-800 flex items-center">
+                <span class="text-green-500 text-4xl mr-3">📘</span> Module 2: Repository Basics
+            </h2>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">What We Learn: Git's Three States (Simplified)</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li><strong class="font-medium text-gray-800">Working Directory:</strong> This is where you actually write and edit your code files. These are your "current changes."</li>
+                    <li><strong class="font-medium text-gray-800">Staging Area (Index):</strong> Think of this as a "holding area" or a "pre-commit zone." You pick and choose which changes from your working directory you want to include in your *next* snapshot (commit).</li>
+                    <li><strong class="font-medium text-gray-800">Local Repository:</strong> This is where all your "snapshots" (commits) are permanently stored on your computer. It's the complete history of your project.</li>
+                </ul>
+            </div>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">Key Commands:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li><strong class="font-medium text-gray-800">`git init`</strong>: How to *start* tracking a new project with Git. It creates the hidden <code class="bg-gray-100 text-gray-800 rounded px-1">.git</code> folder that stores all the version control magic.
+                        <pre><code>mkdir my_new_project      # Create a new folder
+cd my_new_project         # Go into the folder
+git init                  # Initialize Git in this folder</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git clone`</strong>: If someone else started a project (or you have one on GitHub), this command lets you *download a complete copy* of it to your computer.
+                        <pre><code>git clone https://github.com/user/project-name.git</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git status`</strong>: Your "Git Assistant." This command tells you what's going on in your project: which files you've changed, which are new, and which are ready to be saved.
+                        <pre><code>git status # Always run this to see your current Git situation!</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git add`</strong>: Moves changes from your "Working Directory" to the "Staging Area." You're telling Git: "Hey, I want to include *these specific changes* in my next snapshot."
+                        <pre><code>git add my_amazing_feature.js # Stage a specific file
+git add .                     # Stage ALL changes in the current folder (be careful!)</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git commit`</strong>: Takes everything in your "Staging Area" and permanently saves it as a "snapshot" (a commit) in your "Local Repository." Each commit is a point in time you can always go back to.
+                        <pre><code>git commit -m "Add header section to homepage"
+# The -m stands for 'message'. Write a clear, short message!</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git log`</strong>: Shows you the history of your project. You can see all the commits, who made them, and their messages. It's like looking through your project's diary.
+                        <pre><code>git log            # Full, detailed history
+git log --oneline  # Compact, one-line summary for each commit
+git log --graph    # Shows branches and merges visually (super helpful!)</code></pre>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-3">Best Practices:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li>Commit frequently with clear, concise messages. Small, regular commits are easier to understand and revert if needed. Imagine trying to debug one massive change vs. several small, logical ones!</li>
+                    <li>Do not commit generated or sensitive files. Use your <code class="bg-gray-100 text-gray-800 rounded px-1">.gitignore</code> file to tell Git to ignore things like compiled code, secret API keys, or temporary files.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module 3 Slide -->
+    <div id="slide-3" class="slide-container hidden-slide">
+        <div>
+            <h2 class="font-bold text-gray-800 flex items-center">
+                <span class="text-purple-500 text-4xl mr-3">📘</span> Module 3: Branching & Merging
+            </h2>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">What We Learn: Branches as Parallel Universes</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li><strong class="font-medium text-gray-800">Branches:</strong> Think of a branch as a separate "line of development" or a "parallel universe" for your project. The main branch is usually called <code class="bg-gray-100 text-gray-800 rounded px-1">main</code> (or <code class="bg-gray-100 text-gray-800 rounded px-1">master</code>). When you create a new branch, you're making a copy of your project at that moment, so you can make changes without affecting the main version. This is great for:
+                        <ul class="list-circle list-inside ml-4 mt-1">
+                            <li>Working on new features without breaking existing code.</li>
+                            <li>Experimenting with ideas that might not work out.</li>
+                            <li>Allowing multiple people to work on different things at once.</li>
+                        </ul>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git branch`</strong>: Use this command to manage your branches.
+                        <pre><code>git branch new-feature       # Create a brand new branch named 'new-feature'
+git branch                   # List all branches you have (the one with '*' is your current branch)
+git branch -d old-branch     # Delete a branch you've already merged (clean up!)
+git branch -D old-branch     # Force delete a branch (use with caution, even if not merged)</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git checkout`</strong>: This is how you *switch* between these parallel universes (branches). When you checkout a branch, your files in the working directory change to match that branch's version.
+                        <pre><code>git checkout new-feature    # Switch to the 'new-feature' branch
+git checkout -b another-feature # Create a new branch AND switch to it in one go!</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git merge`</strong>: Once you've finished work on a feature branch, you'll want to bring those changes back into your main branch. This is what `git merge` does – it combines the histories of two branches.
+                        <pre><code>git checkout main           # First, go to the branch you want to merge *into*
+git merge new-feature       # Now, merge changes from 'new-feature' into 'main'</code></pre>
+                        If Git can't figure out how to combine changes automatically (e.g., you and a teammate changed the *exact same line* differently), you'll encounter a <strong class="font-medium text-gray-800">Merge Conflict</strong>. Don't panic! Git will tell you which files have conflicts, and you'll manually decide which changes to keep. We'll cover resolving these on the next slide!
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git rebase` (Advanced - For Later!)</strong>: This is another way to combine changes, but it rewrites your project's history to make it look cleaner and more linear. While powerful, it can be tricky for beginners and can cause issues if used on branches that others are actively working on. It's often best to stick with `git merge` until you're more comfortable.
+                        <pre><code># Not recommended for beginners on shared branches!
+git checkout my-feature &amp;&amp; git rebase main</code></pre>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-3">Best Practices:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li>Follow consistent branch naming conventions (e.g., <code class="bg-gray-100 text-gray-800 rounded px-1">feature/login-page</code>, <code class="bg-gray-100 text-gray-800 rounded px-1">bugfix/nav-bug</code>, <code class="bg-gray-100 text-gray-800 rounded px-1">hotfix/critical-error</code>). This makes it easy for everyone to understand the purpose of each branch.</li>
+                    <li>Keep feature branches short-lived. The longer a branch lives separate from <code class="bg-gray-100 text-gray-800 rounded px-1">main</code>, the more changes accumulate, and the harder (and more painful!) merges can become. Merge often!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW Module: Conflict Resolution Slide -->
+    <div id="slide-4" class="slide-container hidden-slide">
+        <div>
+            <h2 class="font-bold text-gray-800 flex items-center">
+                <span class="text-orange-500 text-4xl mr-3">⚠️</span> Module 4: Conflict Resolution
+            </h2>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">What are Conflicts?</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li>A Git conflict happens when two different branches have changes to the same part of the same file, and Git cannot automatically decide which change to keep. This most commonly occurs during a `git merge` or `git pull`.</li>
+                    <li><strong class="font-medium text-gray-800">Common Causes:</strong>
+                        <ul class="list-circle list-inside ml-4 mt-1">
+                            <li>Two people editing the same lines in a file.</li>
+                            <li>One person deletes a file while another modifies it.</li>
+                        </ul>
+                    </li>
+                    <li>When a conflict occurs, Git will pause the merge and tell you which files are conflicted. You'll see "CONFLICT (content): Merge conflict in [filename]" in your terminal.</li>
+                </ul>
+            </div>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">How to Resolve Conflicts:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li><strong class="font-medium text-gray-800">1. Identify Conflicts:</strong> Run `git status` to see files marked as "unmerged".
+                        <pre><code>git status</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">2. Open the Conflicted File:</strong> You'll see special "conflict markers" in your code:
+                        <pre><code class="language-diff">
+<<<<<<< HEAD
+This is the content from my current branch (HEAD).
+=======
+This is the content from the branch I'm merging.
+>>>>>>> feature/my-feature
+                        </code></pre>
+                        * `<<<<<<< HEAD`: Marks the beginning of the changes from your current branch.
+                        * `=======`: Separates your changes from the incoming changes.
+                        * `>>>>>>> feature/my-feature`: Marks the end of the incoming changes from the other branch.
+                    </li>
+                    <li><strong class="font-medium text-gray-800">3. Manually Edit:</strong> Delete the conflict markers and edit the code to the desired final version. You decide which parts to keep, combine, or discard.</li>
+                    <li><strong class="font-medium text-gray-800">4. Stage the Resolved File:</strong> After editing, tell Git that you've resolved the conflicts for that file.
+                        <pre><code>git add conflicted_file.txt</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">5. Commit the Merge:</strong> Once all conflicts are resolved and staged, commit to complete the merge. Git often provides a default commit message.
+                        <pre><code>git commit -m "Merge branch 'feature/my-feature' into main (resolved conflicts)"</code></pre>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-3">Best Practice:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li>Don't be afraid of conflicts! They are a normal part of collaborative development. Practice resolving them to get comfortable.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module 4 Slide (shifted from original Module 4) -->
+    <div id="slide-5" class="slide-container hidden-slide">
+        <div>
+            <h2 class="font-bold text-gray-800 flex items-center">
+                <span class="text-red-500 text-4xl mr-3">📘</span> Module 5: Intro to GitHub</h2>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">What We Learn: Sharing Your Code Online!</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li><strong class="font-medium text-gray-800">Creating Repositories on GitHub:</strong> This is where you create a new online home for your Git project. Once it's on GitHub, others can see it, contribute to it, and you have a remote backup of your code!</li>
+                    <li><strong class="font-medium text-gray-800">`git remote`</strong>: This command tells your local Git repository where its online counterpart is. The most common remote name is <code class="bg-gray-100 text-gray-800 rounded px-1">origin</code>, which usually points to the GitHub repository you cloned or linked.
+                        <pre><code>git remote add origin https://github.com/your-username/your-repo.git # Link your local repo to GitHub
+git remote -v                                                        # See which remotes you have linked</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git push`</strong>: This is how you "upload" your local saved commits (snapshots) from your computer to your GitHub repository. You're sharing your progress with the world (or your team)!
+                        <pre><code>git push origin main         # Push your local 'main' branch to the 'origin' remote</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git fetch`</strong>: This command downloads the latest changes from the GitHub repository to your local computer, *but it doesn't automatically apply them to your working files*. It's like "checking for new mail" without opening it yet. It lets you see what's new without changing your current work.
+                        <pre><code>git fetch origin             # Fetch all new commits from GitHub's 'origin'</code></pre>
+                    </li>
+                    <li><strong class="font-medium text-gray-800">`git pull`</strong>: This is a combination of `git fetch` AND `git merge`. It downloads the latest changes from GitHub and then automatically tries to integrate them into your current local branch. It's like "checking for new mail AND opening it immediately."
+                        <pre><code>git pull origin main         # Pull changes from 'origin/main' into your current branch</code></pre>
+                        It's good practice to <code class="bg-gray-100 text-gray-800 rounded px-1">git pull</code> before starting work each day to ensure you have the latest code.
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-3">Best Practices:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li>Always write a comprehensive <code class="bg-gray-100 text-gray-800 rounded px-1">README.md</code> file. This is the first thing people see when they visit your GitHub repository. It should explain what your project is, how to set it up, how to run it, and how others can contribute.</li>
+                    <li>Include a <code class="bg-gray-100 text-gray-800 rounded px-1">LICENSE</code> file. This file tells others how they are allowed to use, modify, and distribute your code. It's important for protecting your work and for open-source collaboration.</li>
+                    <li>In team environments, set up <code class="bg-gray-100 text-gray-800 rounded px-1">branch protection rules</code> on critical branches (like <code class="bg-gray-100 text-gray-800 rounded px-1">main</code> or <code class="bg-gray-100 text-gray-800 rounded px-1">develop</code>). These rules can require things like code reviews or automated tests to pass before new code can be added, ensuring high quality.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module 5 Slide (shifted from original Module 5) -->
+    <div id="slide-6" class="slide-container hidden-slide">
+        <div>
+            <h2 class="font-bold text-gray-800 flex items-center">
+                <span class="text-yellow-500 text-4xl mr-3">📘</span> Module 6: Pull Requests & Code Review
+            </h2>
+            <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-3">What We Learn: Teamwork with Pull Requests</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li><strong class="font-medium text-gray-800">Pull Requests (PRs):</strong> A Pull Request (often called a PR, or Merge Request on other platforms) is your way of formally proposing changes from a feature branch back into the main branch on GitHub. It's not just about merging code; it's about starting a conversation! Think of it as "asking for feedback on your work before it becomes official."</li>
+                    <li><strong class="font-medium text-gray-800">Reviewers:</strong> When you open a PR, you'll ask teammates to be "reviewers." Their job is to carefully look at your code, suggest improvements, catch potential bugs, and ensure it follows project standards. This improves code quality and helps everyone learn.</li>
+                    <li><strong class="font-medium text-gray-800">Discussion:</strong> The PR page on GitHub is a central place for discussion. Reviewers can leave comments on specific lines of code, ask questions, or suggest alternative solutions. This back-and-forth helps refine the changes before they are integrated.</li>
+                    <li><strong class="font-medium text-gray-800">Approvals:</strong> Once the code has been reviewed, all feedback has been addressed, and the reviewers are satisfied, they can "approve" the Pull Request. Often, a certain number of approvals are required before the code can be merged into the main branch, acting as a quality checkpoint.</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-700 mb-3">Best Practices:</h3>
+                <ul class="text-lg text-gray-600 space-y-2">
+                    <li>Keep PRs focused and small. Each PR should ideally address a single feature, bug fix, or a small, logical set of changes. Smaller PRs are much easier and faster for reviewers to understand and approve, leading to quicker integration.</li>
+                    <li>Use <code class="bg-gray-100 text-gray-800 rounded px-1">draft PRs</code> (sometimes called "Work In Progress" or "WIP" PRs). This is a great way to open a PR even if your work isn't finished. It signals to your team that you're working on something and allows for early feedback, without implying it's ready for final review and merge.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="controls">
+        <button id="prevBtn" class="nav-button" disabled>Previous</button>
+        <span id="slideCounter" class="slide-counter">Slide 1 of 7</span>
+        <button id="nextBtn" class="nav-button">Next</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide-container');
+        const totalSlides = slides.length; // Will now be 7
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideCounter = document.getElementById('slideCounter');
+
+        // Function to show a specific slide
+        function showSlide(index) {
+            // First, hide all slides instantly by setting display: none
+            slides.forEach(slide => {
+                slide.classList.remove('active-slide');
+                slide.classList.add('hidden-slide');
+            });
+
+            // Then, for the target slide, remove hidden-slide
+            // and add active-slide after a slight delay to trigger CSS transition
+            setTimeout(() => {
+                slides[index].classList.remove('hidden-slide');
+                slides[index].classList.add('active-slide');
+            }, 10); // Small delay to allow display:block to take effect before transition
+
+            updateNavigation();
+        }
+
+        // Function to update button states and slide counter
+        function updateNavigation() {
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+            slideCounter.textContent = `Slide ${currentSlide + 1} of ${totalSlides}`;
+        }
+
+        // Event listeners for navigation buttons
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        // Initialize presentation on window load
+        window.onload = function() {
+            showSlide(currentSlide); // Show the first slide initially
+        };
+    </script>
+
+</body>
+</html>
